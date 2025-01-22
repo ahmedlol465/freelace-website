@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import AccountData from "../components/AccountData";
-import HowYouKnowForm from "../components/TellAboutYourSelf";
-import SignupFormStep2 from "../components/Profile";
+import AccountData from "../components/AcountSetup/AccountData";
+import HowYouKnowForm from "../components/AcountSetup/TellAboutYourSelf";
+import SignupFormStep2 from "../components/AcountSetup/Profile";
 import { FaCheckCircle } from "react-icons/fa";
 import AccountActivated from "../components/Succus";
 
@@ -10,7 +10,7 @@ const AccountSetup: React.FC = () => {
     parseInt(localStorage.getItem("currentStep") || "1")
   );
   console.log(currentStep);
-  
+
   const handleNext = () => {
     setCurrentStep(currentStep + 1);
     localStorage.setItem("currentStep", currentStep.toString());
@@ -34,7 +34,6 @@ const AccountSetup: React.FC = () => {
     { label: "Profile" },
     { label: "Tell Us About Yourself" },
   ];
-
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -87,8 +86,12 @@ const AccountSetup: React.FC = () => {
         <div className=" flex justify-center w-full">
           <div>
             <div>
-              {currentStep === 1 && <AccountData setCurrentStep={setCurrentStep}/>}
-              {currentStep === 2 && <SignupFormStep2 setCurrentStep={setCurrentStep}/>}
+              {currentStep === 1 && (
+                <AccountData setCurrentStep={setCurrentStep} />
+              )}
+              {currentStep === 2 && (
+                <SignupFormStep2 setCurrentStep={setCurrentStep} />
+              )}
               {currentStep === 3 && <HowYouKnowForm />}
               {currentStep > 3 && <AccountActivated />}
             </div>

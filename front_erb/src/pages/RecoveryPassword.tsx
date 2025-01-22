@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import AccountData from '../components/AccountData';
+import React, { useState } from "react";
+import AccountData from "../components/AcountSetup/AccountData";
 
 interface Step {
   label: string;
@@ -84,12 +84,17 @@ const stepsConfig: Step[] = [
   //   // ),
   // },
   {
-    label: 'Profile',
+    label: "Profile",
     content: (
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">Profile Information</h2>
         <div className="mb-6">
-          <label htmlFor="specialization" className="block text-sm font-semibold text-gray-700">Specialization</label>
+          <label
+            htmlFor="specialization"
+            className="block text-sm font-semibold text-gray-700"
+          >
+            Specialization
+          </label>
           <select
             id="specialization"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -101,7 +106,12 @@ const stepsConfig: Step[] = [
           </select>
         </div>
         <div className="mb-6">
-          <label htmlFor="jobTitle" className="block text-sm font-semibold text-gray-700">Job Title</label>
+          <label
+            htmlFor="jobTitle"
+            className="block text-sm font-semibold text-gray-700"
+          >
+            Job Title
+          </label>
           <input
             type="text"
             id="jobTitle"
@@ -113,11 +123,13 @@ const stepsConfig: Step[] = [
     ),
   },
   {
-    label: 'Business gallery',
+    label: "Business gallery",
     content: (
       <div className="p-6">
         <h2 className="text-xl font-semibold mb-4">Business Gallery</h2>
-        <p className="text-gray-700 mb-4">Upload images and details about your business.</p>
+        <p className="text-gray-700 mb-4">
+          Upload images and details about your business.
+        </p>
       </div>
     ),
   },
@@ -164,17 +176,32 @@ const MultiStepForm: React.FC = () => {
                   <div
                     key={index}
                     className="flex flex-col items-center"
-                    style={{ left: `${(index / (stepsConfig.length - 1)) * 100}%`, transform: 'translateX(-50%)' }}
+                    style={{
+                      left: `${(index / (stepsConfig.length - 1)) * 100}%`,
+                      transform: "translateX(-50%)",
+                    }}
                   >
                     <div
                       className={`
                         relative z-20 w-5 h-5 rounded-full border-2 flex items-center justify-center
-                        ${index <= currentStep ? 'bg-white border-blue-500 text-blue-500' : 'bg-gray-300 border-gray-300 text-gray-600'}
-                        ${index < currentStep ? 'bg-blue-500 border-blue-500 text-white' : ''}
+                        ${
+                          index <= currentStep
+                            ? "bg-white border-blue-500 text-blue-500"
+                            : "bg-gray-300 border-gray-300 text-gray-600"
+                        }
+                        ${
+                          index < currentStep
+                            ? "bg-blue-500 border-blue-500 text-white"
+                            : ""
+                        }
                         transition-colors duration-200
                       `}
                     >
-                      {index < currentStep ? <span className="text-xs">✓</span> : index + 1}
+                      {index < currentStep ? (
+                        <span className="text-xs">✓</span>
+                      ) : (
+                        index + 1
+                      )}
                     </div>
                   </div>
                 ))}
@@ -202,9 +229,7 @@ const MultiStepForm: React.FC = () => {
               Next
             </button>
           ) : (
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
+            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
               Complete
             </button>
           )}

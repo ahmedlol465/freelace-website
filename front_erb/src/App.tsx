@@ -5,9 +5,9 @@ import SignInPage from "./pages/SignIn";
 import PasswordRecoveryPage from "./pages/RecoveryPassword";
 import JoinUsPage from "./pages/JoinUs";
 import AccountSetup from "./pages/AccountSetUp";
-import SignupFormStep2 from "./components/Profile";
-import TellUsAboutYourself from "./components/TellAboutYourSelf";
-import HowYouKnowForm from "./components/TellAboutYourSelf";
+import SignupFormStep2 from "./components/AcountSetup/Profile";
+import TellUsAboutYourself from "./components/AcountSetup/TellAboutYourSelf";
+import HowYouKnowForm from "./components/AcountSetup/TellAboutYourSelf";
 import BusinessGallery from "./components/BussnissGallaryFreeLance";
 import ControlPanel from "./pages/ControlPanal";
 import UserAccount from "./pages/UserAccount";
@@ -24,9 +24,12 @@ function App() {
           <Route path="/joinUs" element={<JoinUsPage />} />
           <Route path="/accountSetup" element={<AccountSetup />} />
           <Route path="/businessGallery" element={<BusinessGallery />} />
-          { <Route path="/ControlPanel" element={<ControlPanel />} /> }
-        <Route path="/UserAccount" element={<UserAccount />} />
-        <Route path="/FinancialTransactions" element={<FinancialTransactions />} />
+          {<Route path="/ControlPanel" element={<ControlPanel />} />}
+          <Route path="/UserAccount" element={<UserAccount />} />
+          <Route
+            path="/FinancialTransactions"
+            element={<FinancialTransactions />}
+          />
         </Routes>
       </Layout>
     </BrowserRouter>
