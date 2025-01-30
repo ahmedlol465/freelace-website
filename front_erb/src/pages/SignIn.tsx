@@ -5,6 +5,9 @@ import { FaLinkedin } from 'react-icons/fa';
 import { HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi';
 import pro from '../assets/bro.png';
 import { useNavigate } from 'react-router-dom';
+// import { GoogleOAuthProvider, useGoogleOneTapLogin } from '@react-oauth/google';
+import { useLinkedIn } from 'react-linkedin-login-oauth2';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -40,18 +43,90 @@ const SignInPage = () => {
     }
   };
 
+  const { linkedInLogin } = useLinkedIn({
+        clientId: '77lxsqtgmxi16p',
+        redirectUri: "http://localhost:5173", // for Next.js, you can use `${typeof window === 'object' && window.location.origin}/linkedin`
+        onSuccess: (code) => {
+          console.log(code);
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      });
+    
+
+
+
+  const clientId = "100896657605-pb71jug95rv6ue0ild60li7arelhala3.apps.googleusercontent.com"
+  // const clientSecret = "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"
+
+
+  // useGoogleOneTapLogin({
+  //   onSuccess:(CredentialResponse) => {
+  //     console.log(CredentialResponse);
+
+  //   },
+  //   use_fedcm_for_prompt: true
+  // })
+
+
+
+
+
+      const login = useGoogleLogin({
+          onSuccess: async (tokenResponse) => {
+              const accessToken = tokenResponse.access_token;
+  
+              if (!accessToken) {
+                  alert("Google Login Success, but access token is missing.");
+                  return;
+              }
+  
+              try {
+                  // Fetch user info from Google API
+                  const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                      headers: {
+                          Authorization: `Bearer ${accessToken}`,
+                      },
+                  });
+  
+                  if (userInfoResponse.ok) {
+                      const userInfo = await userInfoResponse.json();
+                      const email = userInfo.email; // Extract email
+                      console.log("User Email:", email);
+                      console.log("Full UserInfo Response:", userInfo);
+                      alert(`Google Login Successful! Email: ${email}`);
+                  } else {
+                      console.error(
+                          "Failed to fetch user info from Google Userinfo API:",
+                          userInfoResponse.status,
+                          userInfoResponse.statusText
+                      );
+                      alert("Google Login Successful, but failed to fetch user email.");
+                  }
+              } catch (error) {
+                  console.error("Error fetching user info:", error);
+                  alert("Error fetching user email from Google.");
+              }
+          },
+          onError: () => {
+              alert("Google Login failed.");
+          },
+      });
+
   return (
+    <>
     <div className="flex-col min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <h2 className="text-4xl font-bold text-gray-800 text-center mb-6">Sign in</h2>
 
       <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg overflow-hidden md:flex">
         <div className="w-full md:w-1/2 py-10 px-8 md:px-12 lg:px-16">
           <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-6">
-            <button className="flex items-center justify-center bg-red-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md">
+            <button onClick={() => login()} className="flex items-center justify-center bg-red-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-600 transition-all duration-200 shadow-md">
               <FcGoogle className="mr-2 text-2xl" />
               Sign in with Google
             </button>
-            <button className="flex items-center justify-center bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md">
+            <button  onClick={linkedInLogin} className=" cursor-pointer flex items-center justify-center bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md">
                 <FaLinkedin className="mr-2 text-2xl" />
                 Sign in with LinkedIn
               </button>
@@ -117,7 +192,40 @@ const SignInPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
 export default SignInPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+//  const SignInPage = () => {
+//   return (
+//     <iframe
+//         src="https://accept.paymob.com/api/acceptance/iframes/896889?payment_token=ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SjFjMlZ5WDJsa0lqb3hPVEExT0RVd0xDSmhiVzkxYm5SZlkyVnVkSE1pT2pFd01EQXdMQ0pqZFhKeVpXNWplU0k2SWtWSFVDSXNJbWx1ZEdWbmNtRjBhVzl1WDJsa0lqbzBPVE01TURJNUxDSnZjbVJsY2w5cFpDSTZNamt3TlRBMk1qSTJMQ0ppYVd4c2FXNW5YMlJoZEdFaU9uc2labWx5YzNSZmJtRnRaU0k2SWtwdmFHNGlMQ0pzWVhOMFgyNWhiV1VpT2lKRWIyVWlMQ0p6ZEhKbFpYUWlPaUpGZEdoaGJpQk1ZVzVrSWl3aVluVnBiR1JwYm1jaU9pSkhhWHBoSWl3aVpteHZiM0lpT2lJME1pSXNJbUZ3WVhKMGJXVnVkQ0k2SWpnd015SXNJbU5wZEhraU9pSkhhWHBoSWl3aWMzUmhkR1VpT2lKT1FTSXNJbU52ZFc1MGNua2lPaUpGWjNsd2RDSXNJbVZ0WVdsc0lqb2lkR1Z6ZEVCbGVHRnRjR3hsTG1OdmJTSXNJbkJvYjI1bFgyNTFiV0psY2lJNklqQXhNREV4TVRFeE1URXhJaXdpY0c5emRHRnNYMk52WkdVaU9pSXdNVGc1T0NJc0ltVjRkSEpoWDJSbGMyTnlhWEIwYVc5dUlqb2lUa0VpZlN3aWJHOWphMTl2Y21SbGNsOTNhR1Z1WDNCaGFXUWlPbVpoYkhObExDSmxlSFJ5WVNJNmUzMHNJbk5wYm1kc1pWOXdZWGx0Wlc1MFgyRjBkR1Z0Y0hRaU9tWmhiSE5sTENKbGVIQWlPakUzTXpneE5UTTNPVFlzSW5CdGExOXBjQ0k2SWpReExqSXpPQzR4TmpVdU9USWlmUS5DNFdOV3hyMjVTN1NxVkdQRmpyTVpTVHJUWS10aVBwV3RUZGxFSWttMFRMeDNMNE5ZRFZRdjNUNms4bG5seUFyR3FoNWVpV2dwTnNLVkFVbzIzdEhlUQ=="  // Replace with the actual Paymob iframe URL
+//         width="100%"  // Adjust based on your design
+//         height="600px"  // Adjust based on your design
+//         frameBorder="0"
+//         title="Paymob Payment"
+//       ></iframe>
+//   )
+// }
+
+// export default SignInPage
+
+
+
+
+
+

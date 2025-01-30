@@ -12,6 +12,10 @@ import BusinessGallery from "./components/BussnissGallaryFreeLance";
 import ControlPanel from "./pages/ControlPanal";
 import UserAccount from "./pages/UserAccount";
 import FinancialTransactions from "./pages/AccountBalance";
+import AddProjectForm from "./pages/AddProject";
+import AddServiceForm from "./pages/AddService";
+import ServiceListingPage from "./pages/ServiceListPage";
+import BusinessGalleryPage from "./pages/BusinessGalleryPage";
 // import MultiStepForm from "./pages/RecoveryPassword";
 
 function App() {
@@ -30,6 +34,11 @@ function App() {
             path="/FinancialTransactions"
             element={<FinancialTransactions />}
           />
+          <Route path="/AddProjectForm" element={<AddProjectForm />} />
+          <Route path="/AddServiceForm" element={<AddServiceForm />} />
+
+          <Route path="/ServiceListingPage" element={<ServiceListingPage />} />
+          <Route path="/BusinessGalleryPage" element={<BusinessGalleryPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
