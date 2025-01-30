@@ -57,20 +57,6 @@ const SignInPage = () => {
 
 
 
-  // const clientId = "100896657605-pb71jug95rv6ue0ild60li7arelhala3.apps.googleusercontent.com"
-  // const clientSecret = "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"
-
-
-  // useGoogleOneTapLogin({
-  //   onSuccess:(CredentialResponse) => {
-  //     console.log(CredentialResponse);
-
-  //   },
-  //   use_fedcm_for_prompt: true
-  // })
-
-
-
 
 
       const login = useGoogleLogin({
