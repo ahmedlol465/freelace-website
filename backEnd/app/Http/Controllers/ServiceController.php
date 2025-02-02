@@ -39,6 +39,7 @@ class ServiceController extends Controller
             'to_date' => 'nullable|date',
             'link' => 'nullable|string|max:255',
             'user_id' => 'required|exists:users,id',
+            'status' => 'required|in:sent,opened,completed,canceled',
         ]);
 
         // Handle file uploads
@@ -78,4 +79,38 @@ class ServiceController extends Controller
     {
         //
     }
+
+
+
+    public function getStatusCounts()
+    {
+        $user = auth()->user();
+        $serviceCounts = Service::where('user_id', $user->id)
+            ->select('status', \DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
+
+        $totalServices = Service::where('user_id', $user->id)->count();
+
+        $statuses = [
+            'sent', 'opened', 'completed', 'canceled' // Service statuses based on image order
+        ];
+
+        $statusData = [];
+        foreach ($statuses as $status) {
+            $count = $serviceCounts->get($status)?->count ?? 0;
+            $percentage = $totalServices > 0 ? round(($count / $totalServices) * 100) : 0;
+            $statusData[$status] = [
+                'count' => $count,
+                'percentage' => $percentage,
+            ];
+        }
+
+
+        return response()->json(['data' => $statusData]);
+    }
+
+
+
 }

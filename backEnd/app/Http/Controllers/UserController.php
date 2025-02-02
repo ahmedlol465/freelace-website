@@ -221,6 +221,13 @@ class UserController extends Controller
     }
 
 
+    public function GetUserData(){
+        $userData = User::with(['userWork', 'userData'])->get();
+        return response()->json([
+            'success' => true,
+            'data' => $userData
+        ]);    }
+
     public function UserData(Request $request)
     {
         // Validate input

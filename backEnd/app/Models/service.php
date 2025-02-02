@@ -23,7 +23,8 @@ class service extends Model
         'from_date',
         'to_date',
         'link',
-        'user_id'
+        'user_id',
+        'status'
     ];
 
 

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->date('from_date');
             $table->date('to_date');
             $table->string('link');
+            $table->string('status');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

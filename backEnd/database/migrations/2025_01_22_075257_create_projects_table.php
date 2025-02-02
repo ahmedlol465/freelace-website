@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('sub_section');
             $table->string('project_link')->nullable();
             $table->string("project_question")->nullable();
+            $table->string("status")->default("under_review");
             $table->timestamps();
 
 

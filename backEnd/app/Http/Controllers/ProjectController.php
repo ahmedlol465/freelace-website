@@ -64,4 +64,40 @@ class ProjectController extends Controller
     {
         //
     }
+
+
+
+    public function getStatusCounts()
+    {
+        $user = auth()->user();
+        $projectCounts = Project::where('user_id', $user->id)
+            ->select('status', \DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status'); // Key by status for easy access
+
+        $totalProjects = Project::where('user_id', $user->id)->count();
+
+        $statuses = [
+            'under_review', 'draft', 'opened', 'in_progress', 'completed', 'closed', 'canceled', 'rejected' // Project statuses based on image order
+        ];
+
+        $statusData = [];
+        foreach ($statuses as $status) {
+            $count = $projectCounts->get($status)?->count ?? 0;
+            $percentage = $totalProjects > 0 ? round(($count / $totalProjects) * 100) : 0;
+            $statusData[$status] = [
+                'count' => $count,
+                'percentage' => $percentage,
+            ];
+        }
+
+        return response()->json(['data' => $statusData]);
+    }
+
+
+
+
+
+
 }

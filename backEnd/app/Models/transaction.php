@@ -12,6 +12,9 @@ class transaction extends Model
     /** @use HasFactory<\Database\Factories\TransactionFactory> */
     use HasFactory;
 
+
+
+
     protected $fillable = [
         'user_id',
         'transaction_type',
@@ -20,21 +23,23 @@ class transaction extends Model
         'status',
         'related_job_id',
         'related_service_id',
-        'notes',
+        'notes'
     ];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function job(): BelongsTo
+    public function project()
     {
-        return $this->belongsTo(Job::class, 'related_job_id');
+        return $this->belongsTo(Project::class, 'related_job_id');
     }
 
-    public function service(): BelongsTo
+
+    public function service()
     {
         return $this->belongsTo(Service::class, 'related_service_id');
     }
-}
+
+    }

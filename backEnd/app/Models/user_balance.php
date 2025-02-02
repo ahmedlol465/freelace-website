@@ -11,19 +11,15 @@ class user_balance extends Model
     /** @use HasFactory<\Database\Factories\UserBalanceFactory> */
     use HasFactory;
 
-    protected $primaryKey = 'user_id';
-    public $incrementing = false;
-    protected $keyType = 'int';
-
     protected $fillable = [
         'user_id',
         'total_balance',
         'pending_balance',
         'available_balance',
-        'withdrawal_balance',
+        'withdrawal_balance'
     ];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

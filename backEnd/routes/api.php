@@ -7,6 +7,13 @@ use App\Http\Controllers\ProjectController;
 
 use App\Http\Controllers\PaymobController;
 use App\Http\Controllers\PayPalApiController;
+use App\Http\Controllers\UserBalanceController;
+
+// use App\Http\Controllers\UserBalanceController;
+use App\Http\Controllers\TransactionController;
+
+use App\Http\Controllers\PurchaseController; // Import PurchaseController
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -65,3 +72,29 @@ Route::get('/paypal/success', [PayPalApiController::class, 'success'])->name("pa
 Route::get('/payment/cancel', function () {
     return 'Payment was canceled.';
 })->name('payment.cancel');
+
+Route::get('/getUser', [UserController::class, 'GetUserData']);
+
+
+Route::middleware('auth:api')->
+apiResource('user-balances', UserBalanceController::class);
+
+
+Route::apiResource('transactions', TransactionController::class);
+
+
+Route::middleware('auth:api')->
+get('projects/status-counts', [ProjectController::class, 'getStatusCounts']);
+
+
+Route::middleware('auth:api')->
+get('services/status-counts', [ServiceController::class, 'getStatusCounts']);
+
+
+Route::middleware('auth:api')->
+get('purchases/status-counts', [PurchaseController::class, 'getStatusCounts']);
+
+
+Route::
+middleware('auth:api')->
+apiResource('purchases', PurchaseController::class);

@@ -35,7 +35,7 @@ class User extends Authenticatable implements JWTSubject
         'role',
         "userName",
         "accountType",
-        
+
         'isEmailVerified',
 
     ];
@@ -62,4 +62,10 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function userWork(){
+        return $this->hasOne(UserWork::class, 'userId');
+    }
+    public function userData(){
+        return $this->hasOne(UserData::class, "userId");
+    }
 }

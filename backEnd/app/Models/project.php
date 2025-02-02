@@ -19,6 +19,7 @@ class project extends Model
         'sub_section',
         'project_link',
         'project_question',
-        'user_id'
+        'user_id',
+        'status'
     ];
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->timestamp('transaction_date')->useCurrent();
             $table->string('status', 50)->default('pending');
-            $table->foreignId('related_job_id')->nullable()->constrained('jobs')->nullOnDelete();
+            $table->foreignId('related_job_id')->nullable()->constrained('projects')->nullOnDelete();
             $table->foreignId('related_service_id')->nullable()->constrained('services')->nullOnDelete();
             $table->text('notes')->nullable();
             $table->timestamps();
