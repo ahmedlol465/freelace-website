@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\project;
-use App\Http\Requests\StoreprojectRequest;
-use App\Http\Requests\UpdateprojectRequest;
+use App\Models\Project;
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\UpdateProjectRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -13,25 +15,27 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $projects = Project::with('user')->latest()->paginate(10); // Eager load user, paginate for better performance
+        return response()->json([
+            'message' => 'Projects retrieved successfully.',
+            'data' => $projects,
+        ], 200);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreprojectRequest $request)
+    public function store(StoreProjectRequest $request)
     {
-        $validated = $request->validate([
-            'project_name' => 'required|string|max:255',
-            'project_description' => 'required|string',
-            'project_image' => 'required',
-            'required_skills' => 'required|string',
-            'section' => 'required|string',
-            'sub_section' => 'required|string',
-            'project_link' => 'nullable|string',
-            'project_question' => 'nullable|string',
-            'user_id' => 'required|exists:users,id'
-        ]);
+        $validated = $request->validated();
+
+        // Handle image upload
+        if ($request->hasFile('project_image')) {
+            $imagePath = $this->uploadImage($request->file('project_image'));
+            $validated['project_image'] = $imagePath; // Store the path in the database
+        } else {
+            return response()->json(['message' => 'Project image is required.'], 400); // Or handle default image logic
+        }
 
         $project = Project::create($validated);
 
@@ -44,29 +48,60 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(project $project)
+    public function show(Project $project)
     {
-        //
+        $project->load('user'); // Eager load user for detailed view
+        return response()->json([
+            'message' => 'Project retrieved successfully.',
+            'data' => $project,
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateprojectRequest $request, project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $validated = $request->validated();
+
+        // Handle image upload if a new image is provided
+        if ($request->hasFile('project_image')) {
+            // Delete the old image if it exists (optional, depending on your needs)
+            if ($project->project_image) {
+                Storage::disk('public')->delete($project->project_image);
+            }
+            $imagePath = $this->uploadImage($request->file('project_image'));
+            $validated['project_image'] = $imagePath;
+        }
+
+        $project->update($validated);
+
+        return response()->json([
+            'message' => 'Project updated successfully.',
+            'data' => $project,
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(project $project)
+    public function destroy(Project $project)
     {
-        //
+        // Delete the project image from storage if it exists
+        if ($project->project_image) {
+            Storage::disk('public')->delete($project->project_image);
+        }
+
+        $project->delete();
+
+        return response()->json([
+            'message' => 'Project deleted successfully.',
+        ], 200);
     }
 
-
-
+    /**
+     * Get project status counts for the authenticated user.
+     */
     public function getStatusCounts()
     {
         $user = auth()->user();
@@ -95,9 +130,15 @@ class ProjectController extends Controller
         return response()->json(['data' => $statusData]);
     }
 
-
-
-
-
-
+    /**
+     * Helper function to upload image and return path.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $image
+     * @return string
+     */
+    private function uploadImage($image)
+    {
+        $imageName = Str::random(32) . '.' . $image->getClientOriginalExtension();
+        return $image->storeAs('projects', $imageName, 'public'); // Store in 'projects' folder in public disk
+    }
 }

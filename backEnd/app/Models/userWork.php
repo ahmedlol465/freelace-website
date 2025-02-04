@@ -22,6 +22,10 @@ class userWork extends Model
         'skillsOfWork',
     ];
 
+    protected $casts = [
+        'skillsOfWork' => 'array', // Cast skillsOfWork to array
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'userId');

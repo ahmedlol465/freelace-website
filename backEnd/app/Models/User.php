@@ -14,6 +14,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+use Illuminate\Database\Eloquent\Relations\HasMany; // ✅ Correct import
+
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable implements JWTSubject
@@ -37,6 +40,10 @@ class User extends Authenticatable implements JWTSubject
         "accountType",
 
         'isEmailVerified',
+        'profilePhoto',
+        'Region',
+        'Phone_number',
+        'Gender',
 
     ];
 
@@ -62,10 +69,21 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function userWork(){
+    public function userWorks(){
         return $this->hasOne(UserWork::class, 'userId');
     }
     public function userData(){
         return $this->hasOne(UserData::class, "userId");
     }
+    public function userStatistics(){
+        return $this->hasOne(UserStatistics::class, "userId");
+    }
+
+    public function userProjects(){
+        return $this->hasOne(project::class, "user_id");
+    }
+    public function userServices(){
+        return $this->hasOne(service::class, "user_id");
+    }
+
 }

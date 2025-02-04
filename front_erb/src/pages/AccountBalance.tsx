@@ -1,13 +1,77 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const FinancialTransactions = () => {
+interface BalanceData {
+  id: number;
+  user_id: number;
+  total_balance: string;
+  pending_balance: string;
+  available_balance: string;
+  withdrawal_balance: string;
+  created_at: string;
+  updated_at: string;
+  user: any; // You can define a more specific User interface if needed
+}
+
+interface BalanceResponse {
+  success: boolean;
+  data: BalanceData;
+}
+
+const FinancialTransactions: React.FC = () => {
   const [openinVoice, setOpenInvoice] = useState(false);
+  const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const authToken = localStorage.getItem('token');
+        if (!authToken) {
+          setError("Authentication token not found.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get<BalanceResponse>(`http://127.0.0.1:8000/api/user-balances`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setBalanceData(response.data.data);
+        setLoading(false);
+      } catch (e: any) {
+        setError("Failed to load balance data.");
+        console.error("Error fetching balance:", e);
+        setLoading(false);
+      }
+    };
+
+    fetchBalance();
+  }, []);
+
+
   const handleClickInvoicer = () => {
     setOpenInvoice(true);
   };
   const handleClickfininctial = () => {
     setOpenInvoice(false);
   };
+
+  if (loading) {
+    return <div className="bg-gray-100 min-h-screen p-8">Loading Account Balance...</div>; // Or a loading spinner
+  }
+
+  if (error) {
+    return <div className="bg-gray-100 min-h-screen p-8 text-red-500">Error: {error}</div>;
+  }
+
+  const totalBalance = balanceData?.total_balance || "0.00";
+  const pendingBalance = balanceData?.pending_balance || "0.00";
+  const availableBalance = balanceData?.available_balance || "0.00";
+  const withdrawalBalance = balanceData?.withdrawal_balance || "0.00";
+
 
   return (
     <>
@@ -27,19 +91,19 @@ const FinancialTransactions = () => {
           <div className="grid grid-cols-4 gap-4 mb-6">
             <div>
               <h4 className="text-sm text-gray-600">Total balance</h4>
-              <p className="text-lg font-semibold">0.00 $</p>
+              <p className="text-lg font-semibold">{totalBalance} $</p>
             </div>
             <div>
               <h4 className="text-sm text-gray-600">Pending balance</h4>
-              <p className="text-lg font-semibold">0.00 $</p>
+              <p className="text-lg font-semibold">{pendingBalance} $</p>
             </div>
             <div>
               <h4 className="text-sm text-gray-600">Available balance</h4>
-              <p className="text-lg font-semibold">0.00 $</p>
+              <p className="text-lg font-semibold">{availableBalance} $</p>
             </div>
             <div>
               <h4 className="text-sm text-gray-600">Withdrawal balance</h4>
-              <p className="text-lg font-semibold">0.00 $</p>
+              <p className="text-lg font-semibold">{withdrawalBalance} $</p>
             </div>
           </div>
 

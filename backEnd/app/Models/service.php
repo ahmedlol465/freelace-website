@@ -27,5 +27,6 @@ class service extends Model
         'status'
     ];
 
+    
 
 }

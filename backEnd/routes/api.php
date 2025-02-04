@@ -14,6 +14,8 @@ use App\Http\Controllers\TransactionController;
 
 use App\Http\Controllers\PurchaseController; // Import PurchaseController
 
+use App\Http\Controllers\UserStatisticController; // Import PurchaseController
+
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -23,6 +25,8 @@ use App\Http\Controllers\UserController;
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
+
+Route::get('/GetAllFreelancers', [UserController::class, 'GetAllFreelancers']);
 
 Route::
 middleware('auth:api')->
@@ -83,6 +87,9 @@ apiResource('user-balances', UserBalanceController::class);
 Route::apiResource('transactions', TransactionController::class);
 
 
+Route::apiResource('projects', ProjectController::class);
+
+
 Route::middleware('auth:api')->
 get('projects/status-counts', [ProjectController::class, 'getStatusCounts']);
 
@@ -98,3 +105,27 @@ get('purchases/status-counts', [PurchaseController::class, 'getStatusCounts']);
 Route::
 middleware('auth:api')->
 apiResource('purchases', PurchaseController::class);
+
+
+
+Route::
+middleware('auth:api')->
+apiResource('statistics', UserStatisticController::class);
+
+
+
+Route::
+middleware('auth:api')->
+put('/profileUpdate', [UserController::class, 'updateProfile']); // PUT or PATCH for update
+
+Route::
+middleware('auth:api')->
+get('/GetUser', [UserController::class, 'GetUser']); // PUT or PATCH for update
+
+
+Route::
+middleware('auth:api')->
+put('/ResetPassword', [UserController::class, 'ResetPassword']); // PUT or PATCH for update
+
+
+

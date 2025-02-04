@@ -22,7 +22,16 @@ class UpdateprojectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'project_name' => 'sometimes|string|max:255',
+            'project_description' => 'sometimes|string',
+            // 'project_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Image validation - sometimes
+            'required_skills' => 'sometimes|string',
+            'section' => 'sometimes|string',
+            'sub_section' => 'sometimes|string',
+            'project_link' => 'nullable|url|max:255',
+            'project_question' => 'nullable|string',
+            'user_id' => 'sometimes|exists:users,id', // Consider if user_id should be updatable
+            'status' => 'sometimes|in:under_review,draft,opened,in_progress,completed,closed,canceled,rejected', // Optional status update
         ];
     }
 }

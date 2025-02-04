@@ -19,8 +19,16 @@ class userData extends Model
             'skillsOfWork',
         ];
 
-        public function user()
+        protected $casts = [
+            'skillsOfWork' => 'array', // Cast skillsOfWork to array
+        ];
+
+        // public function user()
+        // {
+        //     return $this->belongsTo(User::class, 'userId');
+        // }
+        public function user(): BelongsTo
         {
-            return $this->belongsTo(User::class, 'userId');
+            return $this->belongsTo(User::class, 'userId', 'id'); // Assuming 'userId' in userData table and 'id' in users table
         }
 }

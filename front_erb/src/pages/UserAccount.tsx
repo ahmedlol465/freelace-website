@@ -1,4 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+// Interfaces for API response and data
+interface StatisticData {
+  id: number;
+  user_id: number;
+  ratings: string;
+  project_completion_rate: string;
+  reemployment_rate: string;
+  on_time_delivery_rate: string;
+  average_response_time: string;
+  registration_date: string;
+  last_seen_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface StatisticResponse {
+  data: StatisticData;
+  meta: {
+    api_version: string;
+  };
+}
+
 
 // Sample data for projects and services (replace with actual data fetching)
 const projectsData = [
@@ -57,116 +81,154 @@ const servicesData = [
   },
 ];
 
-const ProfileContent = () => (
-  <div className="mt-6 space-y-4">
-    <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Statistics</h2>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Ratings</span>
-        <div className="flex items-center space-x-0.5">
-          {[1, 2, 3, 4, 5].map((star) => (
+interface ProfileContentProps {
+    statisticData: StatisticData | null;
+    loading: boolean;
+    error: string | null;
+}
+
+
+const ProfileContent: React.FC<ProfileContentProps> = ({ statisticData, loading, error }) => {
+
+    if (loading) {
+        return <div>Loading Statistics...</div>;
+    }
+
+    if (error) {
+        return <div className="text-red-500">Error loading statistics: {error}</div>;
+    }
+
+    // Function to format numbers to one decimal place if needed, otherwise as integer
+    const formatNumber = (value: string | undefined): string => {
+        const num = Number(value);
+        if (isNaN(num)) return 'N/A';
+        if (num % 1 === 0) { // Check if it's an integer
+            return String(num);
+        } else {
+            return num.toFixed(1);
+        }
+    };
+
+    const ratings = formatNumber(statisticData?.ratings);
+    const projectCompletionRate = formatNumber(statisticData?.project_completion_rate);
+    const reemploymentRate = formatNumber(statisticData?.reemployment_rate);
+    const onTimeDeliveryRate = formatNumber(statisticData?.on_time_delivery_rate);
+    const averageResponseTime = statisticData?.average_response_time || 'N/A';
+    const registrationDate = statisticData?.registration_date || 'N/A';
+    const lastSeen = statisticData?.last_seen_at ? `From ${statisticData.last_seen_at}` : 'N/A'; // Adjust last seen display if needed
+
+
+  return (
+    <div className="mt-6 space-y-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Statistics</h2>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Ratings</span>
+          <div className="flex items-center space-x-0.5">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <svg
+                key={star}
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-4 w-4 ${star <= parseFloat(ratings) ? 'text-yellow-400' : 'text-gray-300'}`}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.172 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.296-1.584-.537-1.65l-4.752-.382-1.831-4.401z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ))}
+            <span className="ml-1">{ratings}</span>
+          </div>
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Project completion rate</span>
+          <span className="font-semibold">{projectCompletionRate}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Reemployment rate</span>
+          <span className="font-semibold">{reemploymentRate}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>On time delivery rate</span>
+          <span className="font-semibold">{onTimeDeliveryRate}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Average speed of response</span>
+          <span>{averageResponseTime}</span>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Registration data</h2>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Registration date</span>
+          <span>{registrationDate}</span>
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 py-1">
+          <span>Last seen</span>
+          <span>{lastSeen}</span>
+        </div>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+        <h2 className="text-lg font-semibold text-gray-700 mb-4">Documentations</h2>
+        <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-1">
             <svg
-              key={star}
               xmlns="http://www.w3.org/2000/svg"
-              className={`h-4 w-4 ${star <= 4 ? 'text-yellow-400' : 'text-gray-300'}`}
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              className="h-4 w-4 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <path
-                fillRule="evenodd"
-                d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.172 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.296-1.584-.537-1.65l-4.752-.382-1.831-4.401z"
-                clipRule="evenodd"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-          ))}
-          <span className="ml-1">4.5</span>
-        </div>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Project completion rate</span>
-        <span className="font-semibold">4.5</span>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Reemployment rate</span>
-        <span className="font-semibold">4.5</span>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>On time delivery rate</span>
-        <span className="font-semibold">4.5</span>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Average speed of response</span>
-        <span>2 hours & 2 min</span>
-      </div>
-    </div>
-
-    <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Registration data</h2>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Registration date</span>
-        <span>22/8/2024</span>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-600 py-1">
-        <span>Last seen</span>
-        <span>From 2 days</span>
-      </div>
-    </div>
-
-    <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Documentations</h2>
-      <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
-        <div className="flex items-center space-x-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-green-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Email</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-green-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          <span>Phone number</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <span>Personal identity</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <span>Payment method</span>
+            <span>Email</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Phone number</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Personal identity</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>Payment method</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ProjectsContent = () => (
   <div className="mt-6 space-y-4">
@@ -302,8 +364,41 @@ const BusinessGalleryContent = () => (
   </div>
 );
 
-const UserAccount = () => {
+const UserAccount: React.FC = () => {
   const [activeTab, setActiveTab] = useState('Profile');
+  const [statisticData, setStatisticData] = useState<StatisticData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const authToken = localStorage.getItem('token');
+        if (!authToken) {
+          setError("Authentication token not found.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get<StatisticResponse>(`http://127.0.0.1:8000/api/statistics`, { // **Updated URL here**
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setStatisticData(response.data.data);
+        setLoading(false);
+
+      } catch (e: any) {
+        setError("Failed to load user statistics.");
+        console.error("Error fetching statistics:", e);
+        setLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
 
   const handleTabClick = (tab: any) => {
     setActiveTab(tab);
@@ -314,7 +409,7 @@ const UserAccount = () => {
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-7xl mb-10 transform transition-all duration-300 hover:shadow-2xl">
         <div className="flex items-center justify-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-800">User account</h1>
-          
+
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Left Section */}
@@ -508,7 +603,11 @@ const UserAccount = () => {
             </div>
 
             {/* Content based on active tab */}
-            {activeTab === 'Profile' && <ProfileContent />}
+            {activeTab === 'Profile' &&  <ProfileContent
+                statisticData={statisticData}
+                loading={loading}
+                error={error}
+              />}
             {activeTab === 'Projects' && <ProjectsContent />}
             {activeTab === 'Services' && <ServicesContent />}
             {activeTab === 'BusinessGallery' && <BusinessGalleryContent />}
